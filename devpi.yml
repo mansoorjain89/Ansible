@@ -1,0 +1,83 @@
+---
+
+- hosts: [db]
+  remote_user: root
+  sudo: yes
+  sudo_user: root
+  tasks:
+    - name: Run apt-get update
+      apt: update_cache=yes upgrade=dist
+
+    - name: Run the auto-remove
+      command: apt-get -y autoremove
+
+    - name: Run the auto clean
+      command: apt-get -y clean
+
+    - name: Installing various apt-get packages
+      apt: name={{ item }} state=present
+      with_items:
+         - software-properties-common
+         - python-pip
+         - python-virtualenv
+         - nginx
+    
+    - name: Installing various apt-get packages
+      apt: name={{ item }} state=present
+      with_items:
+         - python-setuptools
+    
+    - name: Pkg
+      shell: "wget https://bootstrap.pypa.io/ez_setup.py -O - | python"
+
+    - name: Installing the following pkg into virtualenv
+      pip: name={{ item }} state=present virtualenv=/home/virtualdevpi
+      with_items:
+         - devpi-server
+         - devpi-web
+
+    - name: Create a folder for devpi server
+      file: path=/home/devpi state=directory
+
+    - name: Assign the port number and create devpi server config files
+      shell: "/home/virtualdevpi/bin/devpi-server --port 4040 --serverdir /home/devpi --gen-config"
+
+    - name: Copy the nginx config file from default dir to nginx dir
+      command: cp /home/vagrant/gen-config/nginx-devpi.conf /etc/nginx/sites-available/nginx-devpi.conf
+
+    - name: Create a soft link to the nginx conf file in sites enabled
+      command: ln -s /etc/nginx/sites-available/nginx-devpi.conf /etc/nginx/sites-enabled/
+    
+    - name: Restart the nginx server
+      command: sudo service nginx restart
+
+    - name: Run the devpi server
+      shell: "/home/virtualdevpi/bin/devpi-server --port 4040 --start"
+
+    - name: Installing the following pkg into virtualenv
+      pip: name={{ item }} state=present virtualenv=/home/virtualdevpi
+      with_items:
+         - devpi-client
+
+    - name: Registering a new devpiuser
+      shell: "/home/virtualdevpi/bin/devpi user -c devpiuser password=devpipass"
+
+    - name: Login into the devpi client
+      shell: "/home/virtualdevpi/bin/devpi login devpiuser --password=devpipass"
+
+    - name: Create a new dev index
+      shell: "/home/virtualdevpi/bin/devpi index -c dev bases=root/pypi"
+
+    - name: Use the created index
+      shell: "/home/virtualdevpi/bin/devpi use devpiuser/dev"
+
+    - name: Set config flags
+      shell: "/home/virtualdevpi/bin/devpi use  --set-cfg devpiuser/dev --always-set-cfg=yes"
+
+#    - name: Use the created index
+#      shell: "/home/virtualdevpi/bin/devpi use devpiuser/dev --set-cfg devpiuser/dev --always-set-cfg=yes"
+
+
+
+
+
