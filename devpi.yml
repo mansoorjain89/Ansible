@@ -59,6 +59,9 @@
       with_items:
          - devpi-client
 
+    - name: connecting to the server and making use of an intial index
+      shell: "/home/virtualdevpi/bin/devpi use http://localhost:4040"
+
     - name: Registering a new devpiuser
       shell: "/home/virtualdevpi/bin/devpi user -c devpiuser password=devpipass"
 
@@ -73,11 +76,3 @@
 
     - name: Set config flags
       shell: "/home/virtualdevpi/bin/devpi use  --set-cfg devpiuser/dev --always-set-cfg=yes"
-
-#    - name: Use the created index
-#      shell: "/home/virtualdevpi/bin/devpi use devpiuser/dev --set-cfg devpiuser/dev --always-set-cfg=yes"
-
-
-
-
-
