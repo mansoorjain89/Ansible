@@ -1,0 +1,9 @@
+---
+
+- name: Install the devpi server
+  hosts: db
+  remote_user: root
+  sudo_user: root
+  sudo: yes
+  roles:
+    - devpi

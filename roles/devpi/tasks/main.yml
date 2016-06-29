@@ -1,0 +1,59 @@
+---
+- name: Run apt-get update
+  apt: update_cache=yes upgrade=dist
+
+- name: Run the auto-remove
+  command: apt-get -y autoremove
+
+- name: Run the auto clean
+  command: apt-get -y clean
+
+- name: Installing various apt-get packages
+  apt: name={{ item }} state=present
+  with_items:
+     - software-properties-common
+     - python-pip
+     - python-virtualenv
+     - nginx
+     - python-setuptools
+
+- name: Pkg
+  shell: "wget https://bootstrap.pypa.io/ez_setup.py -O - | python"
+
+- name: Installing the following pkg into virtualenv
+  pip: name={{ item }} state=present virtualenv={{ devpi_venv }}
+  with_items:
+    - devpi-server
+    - devpi-web
+    - devpi-client
+
+- name: Create a folder for devpi server
+  file: path=/home/devpi state=directory
+
+- name: Copy the nginx config file from default dir to nginx dir
+  copy: src=nginx-devpi.conf dest=/etc/nginx/sites-available/nginx-devpi.conf
+
+- name: Create a soft link to the nginx conf file in sites enabled
+  file: src=/etc/nginx/sites-availabe/nginx-devpi.conf dest=/etc/nginx/sites-enabled/nginx-devpi.conf state=link force=yes
+  notify: Restart Nginx
+
+- name: Run the devpi server
+  shell: "{{ devpi_venv }}/bin/devpi-server --port {{ devpi_port_number }} --start"
+
+- name: connecting to the server and making use of an intial index
+  shell: "{{ devpi_venv }}/bin/devpi use {{ devpi_url }}"
+
+- name: Registering a new devpiuser
+  shell: "{{ devpi_venv }}/bin/devpi user -c {{ devpi_user_name }} password={{ devpi_user_password }}"
+
+- name: Login into the devpi client
+  shell: "{{ devpi_venv }}/bin/devpi login {{ devpi_user_name }} --password={{ devpi_user_password }}"
+
+- name: Create a new dev index
+  shell: "{{ devpi_venv }}/bin/devpi index -c dev bases=root/pypi"
+
+- name: Use the created index
+  shell: "{{ devpi_venv }}/bin/devpi use {{ devpi_user_name }}/dev"
+
+- name: Set config flags
+  shell: "{{ devpi_venv }}/bin/devpi use  --set-cfg {{ devpi_user_name }}/dev --always-set-cfg=yes"
