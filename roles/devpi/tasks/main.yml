@@ -37,38 +37,10 @@
   file: src=/etc/nginx/sites-availabe/nginx-devpi.conf dest=/etc/nginx/sites-enabled/nginx-devpi.conf state=link force=yes
   notify: Restart Nginx
 
-- name: Check if devpi-server already runs
-  shell: "{{ devpi_venv }}/bin/devpi-server --status | grep pid"
-  register: devpi_server_status
-
-- name: Run the devpi server
-  shell: "{{ devpi_venv }}/bin/devpi-server --port {{ devpi_port_number }} --start"
-  when: devpi_server_status.rc == 1
-
-- name: connecting to the server and making use of an intial index
-  shell: "{{ devpi_venv }}/bin/devpi use {{ devpi_url }}"
-
-- name: Checking if the devpi user already exists
-  shell: "{{ devpi_venv }}/bin/devpi user -l | grep {{ devpi_user_name }}"
-  register: devpi_user_status
-
-- name: Registering a new devpiuser
-  shell: "{{ devpi_venv }}/bin/devpi user -c {{ devpi_user_name }} password={{ devpi_user_password }}"
-  when: devpi_user_status.rc == 1
-
-- name: Login into the devpi client
-  shell: "{{ devpi_venv }}/bin/devpi login {{ devpi_user_name }} --password={{ devpi_user_password }}"
-
-- name: Check if devpi user index already exists
-  shell: "{{ devpi_venv }}/bin/devpi index -l | grep {{ devpi_user_name }}"
-  register: devpi_index_status
-
-- name: Create a new dev index
-  shell: "{{ devpi_venv }}/bin/devpi index -c dev bases=root/pypi"
-  when: devpi_index_status.rc == 1
-
-- name: Use the created index
-  shell: "{{ devpi_venv }}/bin/devpi use {{ devpi_user_name }}/dev"
-
-- name: Set config flags
-  shell: "{{ devpi_venv }}/bin/devpi use  --set-cfg {{ devpi_user_name }}/dev --always-set-cfg=yes"
+- name: Starting devpi server, creating devpi users, index and config devpi settings
+  devpi_config: 
+    devpi_user_name: "{{ devpi_user_name }}"
+    devpi_user_password: "{{ devpi_user_password }}"
+    devpi_venv: "{{ devpi_venv }}"
+    devpi_port_number: "{{ devpi_port_number }}"
+    devpi_url: "{{ devpi_url }}"
