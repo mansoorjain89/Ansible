@@ -1,5 +1,0 @@
-devpi_user_name=devpiuser
-devpi_user_password=password
-devpi_venv=/home/virtualdevpi
-devpi_port_number=4040
-devpi_url=http://localhost:$devpi_port_number
