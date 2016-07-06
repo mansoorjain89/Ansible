@@ -1,13 +1,4 @@
 ---
-- name: Run apt-get update
-  apt: update_cache=yes upgrade=dist
-
-- name: Run the auto-remove
-  command: apt-get -y autoremove
-
-- name: Run the auto clean
-  command: apt-get -y clean
-
 - name: Installing various apt-get packages
   apt: name={{ item }} state=present
   with_items:
@@ -17,9 +8,9 @@
      - nginx
      - python-setuptools
 
-- name: Pkg
+- name: Installing the additional ez_setup.py pkg
   shell: "wget https://bootstrap.pypa.io/ez_setup.py -O - | python"
-
+  
 - name: Installing the following pkg into virtualenv
   pip: name={{ item }} state=present virtualenv={{ devpi_venv }}
   with_items:
@@ -27,8 +18,10 @@
     - devpi-web
     - devpi-client
 
-- name: Create a folder for devpi server
-  file: path=/home/devpi state=directory
+- name: Creating a devpi user
+  user:
+     name: "{{ devpi_user_name }}"
+     home: /home/devpi
 
 - name: Copy the nginx config file from default dir to nginx dir
   template:

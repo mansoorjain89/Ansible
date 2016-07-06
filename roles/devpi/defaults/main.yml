@@ -4,5 +4,5 @@ devpi_user_name: devpiuser
 devpi_user_password: password
 devpi_venv: /home/virtualdevpi
 devpi_port_number: 8003
-devpi_url: http://192.168.61.11:8003
-devpi_host: 192.168.61.11
+devpi_url: http://{{ devpi_host }}:{{ devpi_port_number }}
+devpi_host: 169.44.32.202
