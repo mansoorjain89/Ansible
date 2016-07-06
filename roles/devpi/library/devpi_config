@@ -23,7 +23,7 @@ function is_good() {
 }
 
 function start_devpi_server() {
-   stdout=$(devpi-server --port $devpi_port_number --start 2>&1)
+   stdout=$(devpi-server --port $devpi_port_number --host $devpi_host  --start 2>&1)
 }
 
 function create_devpi_user() {

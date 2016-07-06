@@ -31,7 +31,9 @@
   file: path=/home/devpi state=directory
 
 - name: Copy the nginx config file from default dir to nginx dir
-  copy: src=nginx-devpi.conf dest=/etc/nginx/sites-available/nginx-devpi.conf
+  template:
+     src: etc/nginx-devpi.conf
+     dest: /etc/nginx/sites-available/nginx-devpi.conf
 
 - name: Create a soft link to the nginx conf file in sites enabled
   file: src=/etc/nginx/sites-availabe/nginx-devpi.conf dest=/etc/nginx/sites-enabled/nginx-devpi.conf state=link force=yes
@@ -44,3 +46,4 @@
     devpi_venv: "{{ devpi_venv }}"
     devpi_port_number: "{{ devpi_port_number }}"
     devpi_url: "{{ devpi_url }}"
+    devpi_host: "{{ devpi_host }}"
