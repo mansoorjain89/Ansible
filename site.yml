@@ -1,9 +1,17 @@
 ---
+#- name: Install the devpi server
+#  hosts: mravi1
+#  remote_user: root
+#  sudo_user: root
+#  sudo: yes
+#  roles:
+#    - devpi
 
-- name: Install the devpi server
-  hosts: mravi1
-  remote_user: root
-  sudo_user: root
-  sudo: yes
+- name: Install bandersnatch server
+  hosts: localhost 
+  become: yes
+  become_user: root
   roles:
-    - devpi
+    - bandersnatch
+  tags:
+    - bandersnatch

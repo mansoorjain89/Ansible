@@ -1,0 +1,40 @@
+---
+
+- name: create a user specific to bandersnatch
+  user: name=bandersnatch
+
+- name: Install virtualenv pkg
+  apt: name={{ item }}
+  with_items:
+     - python-virtualenv
+     - apache2
+      
+- name: Creating a virtualenv to install bandersnatch
+  command: virtualenv {{ bandersnatch_virtual_env }}
+
+- name: Creating folders to store relevant logs
+  file: path=/var/log/bandersnatch state=directory
+
+- name: Installing the stable version of bandersnatch
+  shell: "{{ bandersnatch_virtual_env }}/bin/pip install -r https://bitbucket.org/pypa/bandersnatch/raw/stable/requirements.txt >> /var/log/bandersnatch/bandersnatch.log"
+
+- name: placing the bandersnatch config file in /etc
+  copy: src=bandersnatch.conf dest=/etc/bandersnatch.conf
+
+- name: Creating a directory to store the bandersnatch mirrors
+  file: path=/srv/pypi state=directory
+
+- name: Populating the mirroring objectes inside /srv/pypi
+  shell: "{{ bandersnatch_virtual_env }}/bin/bandersnatch mirror >> /var/log/bandersnatch/bandersnatch.log"
+
+- name: copy the apache2.conf file to /etc/apache2 location
+  copy: src=apache2.conf dest=/etc/apache2/apache2.conf
+
+- name: Moving the pypi.conf file to sites-available under apache server
+  copy: src=pypi.conf dest=/etc/apache2/sites-available
+
+- name: Creating a softlink in sites-enabled to the pypi.conf file in sites-available
+  file: src=/etc/apache2/sites-available/pypi.conf dest=/etc/apache2/sites-enabled/pypi.conf state=link force=yes
+
+- name: Restart the apache2 server
+  shell: "sudo /etc/init.d/apache2 restart >> /var/log/bandersnatch/bandersnatch.log"
