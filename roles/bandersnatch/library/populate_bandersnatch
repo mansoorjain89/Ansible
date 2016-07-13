@@ -1,0 +1,32 @@
+#!/bin/bash
+
+function fail_module() {
+   printf '{"failed": true, "msg": "%s"}' "$@"
+   exit 1
+}
+
+function verify_argument() {
+    if [ -z "$2" ]
+    then
+       printf '{"failed": true, "msg": "Arg %s must be defined"}' "$1"
+       exit 1
+    fi
+}
+
+function activate_bandersnatch_venv() {
+   cd $bandersnatch_virtual_env
+   source ./bin/activate
+}
+
+function populate_bandersnatch() {
+   ignore=$(bandersnatch mirror 2>&1 >> /var/log/bandersnatch/bandersnatch.log)
+}
+
+source $1
+verify_argument bandersnatch_virtual_env $bandersnatch_virtual_env
+
+activate_bandersnatch_venv
+populate_bandersnatch
+
+printf '{ "changed": false, "failed": false }'
+exit 0 

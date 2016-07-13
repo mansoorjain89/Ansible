@@ -25,7 +25,9 @@
   file: path=/srv/pypi state=directory
 
 - name: Populating the mirroring objectes inside /srv/pypi
-  shell: "{{ bandersnatch_virtual_env }}/bin/bandersnatch mirror >> /var/log/bandersnatch/bandersnatch.log"
+  populate_bandersnatch:
+       bandersnatch_virtual_env : "{{ bandersnatch_virtual_env }}"
+  ignore_errors: yes 
 
 - name: copy the apache2.conf file to /etc/apache2 location
   copy: src=apache2.conf dest=/etc/apache2/apache2.conf
