@@ -19,7 +19,7 @@ function activate_bandersnatch_venv() {
 }
 
 function populate_bandersnatch() {
-   ignore=$(bandersnatch mirror 2>&1 >> /var/log/bandersnatch/bandersnatch.log)
+   ignore=$(bandersnatch mirror >> /var/log/bandersnatch/bandersnatch.log 2>&1)
 }
 
 source $1
