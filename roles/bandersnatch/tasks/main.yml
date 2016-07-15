@@ -19,7 +19,9 @@
   pip: name=bandersnatch virtualenv={{ bandersnatch_virtual_env }}
 
 - name: placing the bandersnatch config file in /etc
-  copy: src=bandersnatch.conf dest=/etc/bandersnatch.conf
+  template: 
+     src: bandersnatch.conf 
+     dest: /etc/bandersnatch.conf
 
 - name: Creating a directory to store the bandersnatch mirrors
   file: path=/srv/pypi state=directory
@@ -28,10 +30,12 @@
   copy: src=apache2.conf dest=/etc/apache2/apache2.conf
 
 - name: Moving the pypi.conf file to sites-available under apache server
-  copy: src=pypi.conf dest=/etc/apache2/sites-available
+  template: 
+      src: etc/apache2/sites-available/pypi-mirror.conf.default 
+      dest: /etc/apache2/sites-available/pypi-mirror.conf
 
 - name: Creating a softlink in sites-enabled to the pypi.conf file in sites-available
-  file: src=/etc/apache2/sites-available/pypi.conf dest=/etc/apache2/sites-enabled/pypi.conf state=link force=yes
+  file: src=/etc/apache2/sites-available/pypi-mirror.conf dest=/etc/apache2/sites-enabled/pypi-mirror.conf state=link force=yes
   notify: restart apache
 
 - name: set up crond job to sync with pypi server
