@@ -1,33 +1,28 @@
 ---
 
-- name: create a user specific to bandersnatch
-  user: name=bandersnatch
+- name: create bandersnatch user
+  user:
+     name: "{{ bandersnatch_username }}"
+     home: "{{ bandersnatch_home_dir }}"
+     move_home: yes
 
-- name: Install virtualenv pkg
+- name: Install virtualenv and apache server pkgs
   apt: name={{ item }}
   with_items:
      - python-virtualenv
      - apache2
-      
-- name: Creating a virtualenv to install bandersnatch
-  command: virtualenv {{ bandersnatch_virtual_env }}
 
 - name: Creating folders to store relevant logs
   file: path=/var/log/bandersnatch state=directory
 
 - name: Installing the stable version of bandersnatch
-  shell: "{{ bandersnatch_virtual_env }}/bin/pip install -r https://bitbucket.org/pypa/bandersnatch/raw/stable/requirements.txt >> /var/log/bandersnatch/bandersnatch.log"
+  pip: name=bandersnatch virtualenv={{ bandersnatch_virtual_env }}
 
 - name: placing the bandersnatch config file in /etc
   copy: src=bandersnatch.conf dest=/etc/bandersnatch.conf
 
 - name: Creating a directory to store the bandersnatch mirrors
   file: path=/srv/pypi state=directory
-
-- name: Populating the mirroring objectes inside /srv/pypi
-  populate_bandersnatch:
-       bandersnatch_virtual_env : "{{ bandersnatch_virtual_env }}"
-       ignore_errors: True 
 
 - name: copy the apache2.conf file to /etc/apache2 location
   copy: src=apache2.conf dest=/etc/apache2/apache2.conf
@@ -40,6 +35,5 @@
   notify: restart apache
 
 - name: set up crond job to sync with pypi server
-  cron: name="sync bandersnatch  mirror" minute="15"
+  cron: name="sync bandersnatch  mirror" minute="*/15"
         job="{{ bandersnatch_virtual_env }}/bin/bandersnatch mirror >> /var/log/bandersnatch/bandersnatch-$(date +%Y-%m-%d).log"
-  ignore_errors: True

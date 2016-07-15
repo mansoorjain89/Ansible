@@ -1,3 +1,7 @@
 ---
 
 bandersnatch_virtual_env: /home/bandersnatch
+bandersnatch_install_pkg: https://bitbucket.org/pypa/bandersnatch/raw/stable/requirements.txt
+bandersnatch_logger_path: /var/log/bandersnatch/bandersnatch.log
+bandersnatch_username: bandersnatch
+bandersnatch_home_dir: /home/bandersnatch
