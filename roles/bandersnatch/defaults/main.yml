@@ -9,3 +9,4 @@ util_server_hostname: mravi2.softlayer.com
 util_server_alias: mravi2.softlayer.com
 pypi_master_directory: /srv/pypi
 pypi_master_url: https://pypi.python.org
+pip_cron_path: /usr/local/bin 
