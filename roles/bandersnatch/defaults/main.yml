@@ -1,12 +1,10 @@
 ---
 
-bandersnatch_virtual_env: /home/bandersnatch
-bandersnatch_logger_path: /var/log/bandersnatch/bandersnatch.log
+bandersnatch_virtual_env: /opt/bandersnatch
+bandersnatch_logger_path: /var/log/bandersnatch
 bandersnatch_username: bandersnatch
-bandersnatch_home_dir: /home/bandersnatch
-apache_pip_mirror_path: /srv/pypi/web/ 
-util_server_hostname: mravi2.softlayer.com
-util_server_alias: mravi2.softlayer.com
+apache_pip_mirror_path: /srv/pypi/web/
+util_server_hostname: prod-dal09-utility-1.internal.open.softlayer.com
+util_server_alias: prod-dal09-utility-1.open.softlayer.com
 pypi_master_directory: /srv/pypi
 pypi_master_url: https://pypi.python.org
-pip_cron_path: /usr/local/bin 

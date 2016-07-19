@@ -3,10 +3,10 @@ Listen 8003
    ServerName {{ util_server_hostname }}
    ServerAlias {{ util_server_alias }}
 
-   DocumentRoot {{ apache_pip_mirror_path }} 
+   DocumentRoot {{ apache_pip_mirror_path }}
    <Directory  "{{ apache_pip_mirror_path }}">
        AllowOverride All
        Options Indexes FollowSymLinks
-       Require all granted      
+       Require all granted
    </Directory>
 </VirtualHost>
