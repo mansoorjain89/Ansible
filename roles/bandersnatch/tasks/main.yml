@@ -12,7 +12,7 @@
      - apache2
 
 - name: Creating folders to store relevant logs
-  file: path=/var/log/bandersnatch state=directory
+  file: path=/var/log/bandersnatch state=directory owner="{{ bandersnatch_username }}"
 
 - name: Installing the stable version of bandersnatch
   pip: name=bandersnatch virtualenv="{{ bandersnatch_virtual_env }}"
@@ -26,7 +26,7 @@
      mode: 0644
 
 - name: Creating a directory to store the bandersnatch mirrors
-  file: path=/srv/pypi state=directory owner=bandersnatch
+  file: path=/srv/pypi state=directory owner=bandersnatch group=bandersnatch
 
 - name: Moving the pypi.conf file to sites-available under apache server
   template:
@@ -39,7 +39,10 @@
   notify: restart apache
 
 - name: Copy the cron job to the pip cron path
-  copy: src=usr/local/bin/pip_mirror_cron.sh dest=/usr/local/bin
+  copy: src=usr/local/bin/pip_mirror_cron.sh dest=/usr/local/bin owner=bandersnatch mode=544
+
+- name: create a lock file if it does not exist
+  file: path=/var/lock/bandersnatch.lck state=touch owner="{{ bandersnatch_username }}"  mode=644
 
 - name: set up crond job to sync with pypi server
-  cron: name="sync bandersnatch  mirror" minute="*/15" job="/usr/local/bin/pip_mirror_cron.sh >> {{ bandersnatch_logger_path }}/pip_mirror_cron_job-$(date +%Y-%m-%d).log"
+  cron: name="sync bandersnatch  mirror" minute="*/5" job="/usr/local/bin/pip_mirror_cron.sh" user="{{ bandersnatch_username }}" 
